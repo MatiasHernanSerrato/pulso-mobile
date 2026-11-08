@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../screens/hoy_screen.dart';
-import '../screens/perfil_screen.dart';
-import '../screens/plata_screen.dart';
-import '../screens/salud_screen.dart';
+import '../features/hoy/presentation/hoy_screen.dart';
+import '../features/perfil/presentation/perfil_screen.dart';
+import '../features/plata/presentation/plata_screen.dart';
+import '../features/salud/presentation/salud_screen.dart';
 import 'shell.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
