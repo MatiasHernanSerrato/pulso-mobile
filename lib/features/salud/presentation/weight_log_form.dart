@@ -90,7 +90,7 @@ class _WeightLogFormState extends State<WeightLogForm> {
               controller: _kg,
               autofocus: true,
               decoration: const InputDecoration(
-                labelText: 'Peso (kg)',
+                labelText: 'Peso',
                 suffixText: 'kg',
               ),
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -111,7 +111,8 @@ class _WeightLogFormState extends State<WeightLogForm> {
             TextFormField(
               controller: _fat,
               decoration: const InputDecoration(
-                labelText: 'Grasa corporal (opcional)',
+                labelText: 'Grasa corporal',
+                helperText: 'opcional',
                 suffixText: '%',
               ),
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
