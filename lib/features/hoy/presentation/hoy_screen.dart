@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../salud/application/weights_controller.dart';
 import '../widgets/summary_card.dart';
 import '../widgets/quick_action.dart';
 
@@ -10,6 +11,8 @@ class HoyScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final hoy = _todayLabel();
+    final last = ref.watch(lastWeightProvider);
+    final avg = ref.watch(sevenDayAverageProvider);
 
     return Scaffold(
       body: CustomScrollView(
@@ -29,18 +32,25 @@ class HoyScreen extends ConsumerWidget {
                       ),
                 ),
                 const SizedBox(height: 16),
-                const SummaryCard(
+                SummaryCard(
                   icon: Icons.monitor_weight_outlined,
                   title: 'Ultimo peso',
-                  primary: 'sin datos',
-                  secondary: 'cargalo manual o conecta la balanza',
+                  primary: last != null
+                      ? '${last.weightKg.toStringAsFixed(1)} kg'
+                      : 'sin datos',
+                  secondary: last != null
+                      ? _relativeDate(last.measuredAt)
+                      : 'cargalo manual o conecta la balanza',
                 ),
                 const SizedBox(height: 12),
-                const SummaryCard(
+                SummaryCard(
                   icon: Icons.favorite_outline,
                   title: 'Promedio 7 dias',
-                  primary: 'sin datos',
-                  secondary: 'necesitamos al menos 3 mediciones',
+                  primary:
+                      avg != null ? '${avg.toStringAsFixed(1)} kg' : 'sin datos',
+                  secondary: avg != null
+                      ? 'calculado sobre las ultimas mediciones'
+                      : 'necesitamos al menos 3 mediciones',
                 ),
                 const SizedBox(height: 12),
                 const SummaryCard(
@@ -89,5 +99,13 @@ class HoyScreen extends ConsumerWidget {
       'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
     ];
     return '${now.day} de ${meses[now.month - 1]}';
+  }
+
+  String _relativeDate(DateTime d) {
+    final diff = DateTime.now().difference(d);
+    if (diff.inHours < 1) return 'hace un rato';
+    if (diff.inHours < 24) return 'hace ${diff.inHours}h';
+    if (diff.inDays < 2) return 'ayer';
+    return 'hace ${diff.inDays} dias';
   }
 }

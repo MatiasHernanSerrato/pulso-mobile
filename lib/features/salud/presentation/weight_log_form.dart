@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../domain/weight_entry.dart';
+
+export '../domain/weight_entry.dart';
+
 /// Formulario para cargar un peso. Devuelve un [WeightEntry] con pop
 /// si se guarda, o null si se cancela.
 class WeightLogForm extends StatefulWidget {
@@ -165,18 +169,3 @@ class _WeightLogFormState extends State<WeightLogForm> {
   }
 }
 
-/// Modelo local del form. Despues se mapea al tipo compartido cuando
-/// arme el provider de weights.
-class WeightEntry {
-  const WeightEntry({
-    required this.weightKg,
-    required this.measuredAt,
-    this.bodyFat,
-    this.note,
-  });
-
-  final double weightKg;
-  final double? bodyFat;
-  final DateTime measuredAt;
-  final String? note;
-}

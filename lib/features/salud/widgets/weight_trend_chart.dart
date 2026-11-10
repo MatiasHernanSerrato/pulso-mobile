@@ -2,7 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../presentation/weight_log_form.dart' show WeightEntry;
+import '../domain/weight_entry.dart';
 
 /// Grafico de tendencia de peso. Pensado para la pestania Salud, usa
 /// fl_chart con una sola serie (kg). Si hay menos de dos puntos devuelve
