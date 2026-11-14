@@ -1,4 +1,30 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- BLE: balanzas inteligentes.
+         En Android 12+ (API 31+) BLUETOOTH_SCAN y BLUETOOTH_CONNECT son
+         runtime permissions. usesPermissionFlags="neverForLocation" evita
+         que el sistema nos obligue a pedir ACCESS_FINE_LOCATION solo para
+         escanear, que es el default historico. En Android <= 11 igual
+         necesitamos ACCESS_FINE_LOCATION porque sin eso el scan devuelve
+         cero devices. -->
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation"
+        tools:targetApi="31" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"
+        tools:targetApi="31" />
+
+    <!-- compat Android <= 11 -->
+    <uses-permission android:name="android.permission.BLUETOOTH"
+        android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
+        android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
+        android:maxSdkVersion="30" />
+
+    <uses-feature android:name="android.hardware.bluetooth_le"
+        android:required="false" />
+
     <application
         android:label="Pulso"
         android:name="${applicationName}"

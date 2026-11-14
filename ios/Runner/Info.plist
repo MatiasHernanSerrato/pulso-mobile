@@ -32,6 +32,14 @@
 	<true/>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Pulso usa Bluetooth para conectarse con tu balanza inteligente y guardar el peso automaticamente.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Pulso se conecta a balanzas inteligentes por Bluetooth para registrar tus mediciones.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>bluetooth-central</string>
+	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
