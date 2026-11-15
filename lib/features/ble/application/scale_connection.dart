@@ -23,6 +23,11 @@ enum ScaleConnectionPhase {
   connecting,
   discovering,
   ready,
+
+  /// Cayo la conexion pero estamos intentando restablecerla sin
+  /// pedirle al usuario que vuelva a tocar nada. La UI muestra el
+  /// nombre del device y un spinner chico.
+  reconnecting,
   disconnected,
   error,
 }
@@ -68,10 +73,25 @@ class ScaleConnectionState {
 /// soportamos todavia (nadie tiene dos balanzas, no vale la pena).
 class ScaleConnectionController extends Notifier<ScaleConnectionState> {
   StreamSubscription<BluetoothConnectionState>? _connStateSub;
+  Timer? _reconnectTimer;
+  int _reconnectAttempts = 0;
+
+  /// Backoff: 1s, 3s, 6s, 10s, y despues damos por perdido. Las
+  /// balanzas tipo Xiaomi se duermen a los ~30s de inactividad; si el
+  /// usuario se bajo y volvio a subir, cualquiera de estos intentos la
+  /// agarra. Despues de los 4 intentos el usuario tiene que iniciar
+  /// la reconexion a mano (mostramos boton).
+  static const List<Duration> _reconnectDelays = [
+    Duration(seconds: 1),
+    Duration(seconds: 3),
+    Duration(seconds: 6),
+    Duration(seconds: 10),
+  ];
 
   @override
   ScaleConnectionState build() {
     ref.onDispose(() async {
+      _reconnectTimer?.cancel();
       await _connStateSub?.cancel();
       final d = state.device;
       if (d != null) {
@@ -87,26 +107,28 @@ class ScaleConnectionController extends Notifier<ScaleConnectionState> {
 
   Future<void> connect(DiscoveredScale target) async {
     // Si teniamos otra conexion viva, la cortamos primero.
-    await disconnect();
+    await _teardown();
 
+    _reconnectAttempts = 0;
     state = state.copyWith(
       phase: ScaleConnectionPhase.connecting,
       device: target,
       clearMessage: true,
     );
 
+    await _doConnect(target, isReconnect: false);
+  }
+
+  /// El loop interno: lo llaman connect() y el reconnect timer.
+  Future<void> _doConnect(DiscoveredScale target,
+      {required bool isReconnect}) async {
     final device = BluetoothDevice.fromId(target.id);
 
-    // Escuchamos el estado para detectar drops.
-    _connStateSub = device.connectionState.listen((cs) {
-      if (cs == BluetoothConnectionState.disconnected &&
-          state.phase != ScaleConnectionPhase.idle) {
-        state = state.copyWith(
-          phase: ScaleConnectionPhase.disconnected,
-          message: 'La balanza se desconecto.',
-        );
-      }
-    });
+    // Escuchamos el estado para detectar drops. Importante: lo
+    // cancelamos antes de re-suscribir, si no quedan listeners
+    // apilados y double trigger del handler.
+    await _connStateSub?.cancel();
+    _connStateSub = device.connectionState.listen(_onConnStateChanged);
 
     try {
       // autoConnect:false porque queremos feedback rapido. Si la
@@ -117,10 +139,14 @@ class ScaleConnectionController extends Notifier<ScaleConnectionState> {
         timeout: const Duration(seconds: 12),
       );
     } on Exception catch (e) {
-      state = state.copyWith(
-        phase: ScaleConnectionPhase.error,
-        message: 'No pudimos conectar: $e',
-      );
+      if (isReconnect) {
+        _scheduleReconnect(target);
+      } else {
+        state = state.copyWith(
+          phase: ScaleConnectionPhase.error,
+          message: 'No pudimos conectar: $e',
+        );
+      }
       return;
     }
 
@@ -148,13 +174,66 @@ class ScaleConnectionController extends Notifier<ScaleConnectionState> {
       return;
     }
 
+    _reconnectAttempts = 0;
     state = state.copyWith(
       phase: ScaleConnectionPhase.ready,
       weightCharacteristic: weightChar,
+      clearMessage: true,
     );
   }
 
+  /// Handler del stream de estado de BLE. Centraliza la logica de
+  /// "se cayo -> reintento" para no duplicarla.
+  void _onConnStateChanged(BluetoothConnectionState cs) {
+    if (cs != BluetoothConnectionState.disconnected) return;
+
+    final currentPhase = state.phase;
+    // Si el usuario ya tiro disconnect() nosotros mismos pasamos a
+    // idle, ahi no hacemos nada.
+    if (currentPhase == ScaleConnectionPhase.idle) return;
+
+    // Caso tipico: estabamos ready y la balanza se durmio. Intentamos
+    // reconectar silenciosamente.
+    final target = state.device;
+    if (target == null) {
+      state = state.copyWith(phase: ScaleConnectionPhase.disconnected);
+      return;
+    }
+
+    state = state.copyWith(
+      phase: ScaleConnectionPhase.reconnecting,
+      message: 'La balanza se durmio, reintentando...',
+    );
+    _scheduleReconnect(target);
+  }
+
+  void _scheduleReconnect(DiscoveredScale target) {
+    _reconnectTimer?.cancel();
+    if (_reconnectAttempts >= _reconnectDelays.length) {
+      state = state.copyWith(
+        phase: ScaleConnectionPhase.disconnected,
+        message: 'No pudimos reconectar. Tocá reintentar.',
+      );
+      return;
+    }
+
+    final delay = _reconnectDelays[_reconnectAttempts];
+    _reconnectAttempts++;
+    _reconnectTimer = Timer(delay, () {
+      // El usuario pudo haber cancelado entre medio.
+      if (state.phase != ScaleConnectionPhase.reconnecting) return;
+      _doConnect(target, isReconnect: true);
+    });
+  }
+
   Future<void> disconnect() async {
+    _reconnectTimer?.cancel();
+    await _teardown();
+    state = const ScaleConnectionState.idle();
+  }
+
+  Future<void> _teardown() async {
+    _reconnectTimer?.cancel();
     final d = state.device;
     await _connStateSub?.cancel();
     _connStateSub = null;
@@ -165,7 +244,6 @@ class ScaleConnectionController extends Notifier<ScaleConnectionState> {
         // ignoramos.
       }
     }
-    state = const ScaleConnectionState.idle();
   }
 
   /// Busca la char 0x2A9D dentro del service 0x181D. Si no esta en el
