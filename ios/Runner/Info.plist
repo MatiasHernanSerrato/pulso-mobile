@@ -32,6 +32,10 @@
 	<true/>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<!-- Shorebird: el SDK lee este flag al arrancar para decidir
+	     si corre el patch resolver antes del primer frame. -->
+	<key>ShorebirdCodePushEnabled</key>
+	<true/>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Pulso usa Bluetooth para conectarse con tu balanza inteligente y guardar el peso automaticamente.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>

@@ -12,6 +12,13 @@
 .swiftpm/
 migrate_working_dir/
 
+# Shorebird: artefactos de patches, caches y builds intermedios.
+# El shorebird.yaml si va al repo (tiene el app_id).
+.shorebird/
+build/shorebird/
+*.aab.backup
+*.apk.backup
+
 # IntelliJ related
 *.iml
 *.ipr

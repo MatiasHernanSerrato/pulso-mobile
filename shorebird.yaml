@@ -1,0 +1,17 @@
+# Pulso mobile - Shorebird config
+# Docs: https://docs.shorebird.dev
+
+# ID de la app en Shorebird. Lo devuelve `shorebird init`.
+# Si cambia, los OTA patches se envian a la app equivocada.
+app_id: 6f3c2a1b-4d8e-4f91-9c0a-3b7e5d2a9f14
+
+# auto_update en true hace que cada release del store compruebe si
+# hay un patch pendiente antes del primer frame. Lo dejo prendido
+# porque la idea del OTA es justamente que corra sin intervencion.
+auto_update: true
+
+# archivos / paths que NO queremos incluir en el patch (ya van en
+# el release del store). Util para assets pesados que no cambian
+# entre patches.
+# assets:
+#   - exclude: assets/fonts/**

@@ -1,0 +1,17 @@
+// Config extra para builds con Shorebird en iOS.
+//
+// Se incluye desde Release.xcconfig. No tocar a mano desde Xcode,
+// Shorebird espera encontrar estas keys con estos nombres.
+
+// Opt-in al code push manager en runtime. El SDK lo lee al arrancar
+// y decide si aplica un patch pendiente.
+SHOREBIRD_OTA_ENABLED=YES
+
+// Canal por defecto. Si algun dia quiero un canal "beta", lo
+// cambio aca y rebuildeo.
+SHOREBIRD_CHANNEL=stable
+
+// Flutter engine: le dejo a shorebird buildear el aot con sus
+// snapshots en lugar del default de flutter. Si esto esta en NO,
+// los patches no aplican aunque el yaml este bien.
+SHOREBIRD_USE_PATCHED_ENGINE=YES
