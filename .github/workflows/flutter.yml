@@ -1,0 +1,92 @@
+name: flutter
+
+# Corre analyze + test en cada push a main y en cada PR. Si rompe,
+# rompe aca antes de que yo lo publique a nadie.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Si empujo varios commits seguidos a la misma branch, matamos los
+# runs viejos para no quemar minutos al pedo.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze-and-test:
+    name: analyze + test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: setup flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.4'
+          channel: stable
+          cache: true
+
+      - name: flutter --version
+        run: flutter --version
+
+      - name: pub get
+        run: flutter pub get
+
+      # verify-formatted lo dejo opt-in con un flag para no bloquear
+      # commits chicos. Si quiero que sea estricto, le saco el `|| true`.
+      - name: format check
+        run: dart format --set-exit-if-changed . || echo "::warning::hay archivos sin formatear"
+
+      - name: analyze
+        run: flutter analyze --no-fatal-infos
+
+      - name: test
+        run: flutter test --coverage --reporter expanded
+
+      # subir el lcov como artifact para poder bajarlo si quiero
+      # revisar que esta cubierto y que no.
+      - name: upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-lcov
+          path: coverage/lcov.info
+          if-no-files-found: ignore
+          retention-days: 14
+
+  # check rapido de que el build android no se rompio. No subimos
+  # el apk, solo verifica que compila.
+  build-android-debug:
+    name: android debug build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: analyze-and-test
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: setup java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: setup flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.4'
+          channel: stable
+          cache: true
+
+      - name: pub get
+        run: flutter pub get
+
+      - name: build apk (debug)
+        run: flutter build apk --debug
