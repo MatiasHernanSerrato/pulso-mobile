@@ -1,7 +1,7 @@
 name: pulso_mobile
 description: "Pulso mobile app - salud + plata en un solo lugar."
 publish_to: 'none'
-version: 0.1.0+1
+version: 0.1.1+2
 
 environment:
   sdk: ^3.5.0
@@ -56,6 +56,9 @@ flutter:
   uses-material-design: true
   assets:
     - assets/branding/
+    # las screenshots viven solo en el repo, no las bundleo en el apk
+    # pero quiero que `flutter pub get` las vea como parte del arbol
+    # cuando armo demos a mano.
 
 flutter_launcher_icons:
   android: true
