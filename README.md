@@ -9,9 +9,28 @@ backend ([pulso-api](https://github.com/MatiasHernanSerrato/pulso-api)).
 El frontend web vive en
 [pulso-web](https://github.com/MatiasHernanSerrato/pulso-web).
 
+[![flutter ci](https://github.com/MatiasHernanSerrato/pulso-mobile/actions/workflows/flutter.yml/badge.svg)](https://github.com/MatiasHernanSerrato/pulso-mobile/actions/workflows/flutter.yml)
 ![flutter](https://img.shields.io/badge/flutter-3.24-blue)
+![dart](https://img.shields.io/badge/dart-3.5-0175C2)
 ![riverpod](https://img.shields.io/badge/riverpod-2.5-7F52FF)
+![shorebird](https://img.shields.io/badge/shorebird-OTA-blueviolet)
 ![platforms](https://img.shields.io/badge/platforms-android%20%7C%20ios-green)
+![license](https://img.shields.io/github/license/MatiasHernanSerrato/pulso-mobile)
+
+## Indice
+
+- [Demo](#demo)
+- [Pantallas](#pantallas)
+- [Que hace](#que-hace)
+- [Arquitectura](#arquitectura)
+- [Correr el proyecto](#correr-el-proyecto)
+- [Tests](#tests)
+- [CI](#ci)
+- [APK para demos](#apk-para-demos)
+- [Releases y OTA con Shorebird](#releases-y-ota-con-shorebird)
+- [BLE: balanzas inteligentes](#ble-balanzas-inteligentes)
+- [Roadmap corto](#roadmap-corto)
+- [Licencia](#licencia)
 
 ## Demo
 
