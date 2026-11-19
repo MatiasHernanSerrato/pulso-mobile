@@ -9,6 +9,7 @@ algo visualmente importante (colores, nav bar, graficos).
 | salud.png       | detalle de peso, tendencia de 30 dias       |
 | plata.png       | detalle de gastos por categoria             |
 | ble_scan.png    | scanning de balanzas via BLE                |
+| demo.gif        | loop de 4 pantallas para el header del README |
 
 Las resoluciones estan pensadas para mostrarse a ~250 px de ancho en
 Markdown. No son capturas de dispositivo real, son renders hechos

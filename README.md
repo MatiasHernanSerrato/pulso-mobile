@@ -13,6 +13,16 @@ El frontend web vive en
 ![riverpod](https://img.shields.io/badge/riverpod-2.5-7F52FF)
 ![platforms](https://img.shields.io/badge/platforms-android%20%7C%20ios-green)
 
+## Demo
+
+<p align="center">
+  <img src="assets/screenshots/demo.gif" alt="pulso mobile en accion" width="260" />
+</p>
+
+Un loop de 4 segundos recorriendo Hoy, Salud, Plata y el scanner
+BLE. Es un render offline hecho a mano, no sale de un emulador,
+pero refleja los tamanios y la paleta reales.
+
 ## Pantallas
 
 <p align="center">
