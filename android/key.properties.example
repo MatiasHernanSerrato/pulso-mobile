@@ -1,0 +1,12 @@
+# Copiar a android/key.properties y rellenar.
+# NO committear key.properties ni el jks, van en .gitignore.
+#
+# Como generar el keystore:
+#   keytool -genkey -v -keystore ~/keys/pulso-upload.jks \
+#     -keyalg RSA -keysize 2048 -validity 10000 -alias pulso-upload
+#
+# storeFile es absoluto o relativo a android/app/.
+storePassword=cambiame
+keyPassword=cambiame
+keyAlias=pulso-upload
+storeFile=/absolute/path/to/pulso-upload.jks

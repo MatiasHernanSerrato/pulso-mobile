@@ -179,6 +179,24 @@ En `.github/workflows/flutter.yml`:
 Tiene `concurrency` para cancelar runs viejos cuando empujo varios
 commits seguidos.
 
+## APK para demos
+
+Para mandarle la app a alguien sin pasar por Play, tengo un script que arma APKs split por ABI apuntando ya a la api de prod:
+
+```bash
+./scripts/build-demo-apk.sh
+```
+
+Los deja en `build/demo/` con fecha + ABI en el nombre. En general mando el `arm64-v8a` que es lo que tienen 9 de cada 10 Android actuales. Son unos 22 MB.
+
+Si querés apuntarlo a otra api, podes exportar `API_URL`:
+
+```bash
+API_URL=http://192.168.1.50:8080 ./scripts/build-demo-apk.sh
+```
+
+Para el signing hay que armar `android/key.properties` a partir de `key.properties.example`. Sin ese archivo cae a debug signing (sirve para probar en tu device, no para distribuir).
+
 ## Releases y OTA con Shorebird
 
 Uso Shorebird para mandar patches OTA sin pasar por los stores.
